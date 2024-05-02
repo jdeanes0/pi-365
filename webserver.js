@@ -2,8 +2,18 @@ var http = require('http').createServer(handler); //require http server, and cre
 var fs = require('fs'); //require filesystem module
 //var io = require('socket.io')(http) //require socket.io module and pass the http object (server)
 
+var static = require('node-static');
+ 
+var fileServer = new static.Server('./public');
+ 
+require('http').createServer(function (request, response) {
+    request.addListener('end', function () {
+        fileServer.serve(request, response);
+    }).resume();
+}).listen(8081);
+
 const io = require('socket.io')(http, {
-    cors: {
+cors: {
         origin: "http://localhost:8080",
         methods: ["GET", "POST"],
         transports: ['websocket', 'polling'],
