@@ -22,9 +22,16 @@
    .content{
      margin:5px;
    }
+   #slideshow{
+     border-radius: 5px;
+     border: 2px, solid, black;
+     display: block;
+     margin-left: auto;
+     margin-right: auto;
+     width: 90%;
+   }
  </style>
- 
- 
+  
 </head>
 <body>
 <div class="header" width="100%" height="60px">
@@ -33,10 +40,13 @@
 <div class="content">
   <p><input type="checkbox" id="light"></p>
   <textarea id="text" width="200" height="100"> </textarea>
-  <img src="http://raspberrypi.local:8081/pres1/Slide1.JPG"></img>
+  <img id="slideshow" src="http://raspberrypi.local:8081/pres1/Slide1.JPG"></img>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script> <!-- include socket.io client side script -->
 <script>
+let slideshow = document.getElementById("slideshow");
+let slideNum = 1;
+let slide = "http://raspberrypi.local:8081/pres1/Slide" + slideNum + ".JPG"; 
 var socket = io(); //load socket.io-client and connect to the host that serves the page
 window.addEventListener("load", function(){ //when page loads
   var lightbox = document.getElementById("light");
@@ -51,7 +61,33 @@ socket.on('light', function (data) { //get button status from client
 socket.on('txt', function (event) {
  document.getElementById("text").textContent = event
  console.log(event);
+ let msg = new String(event)
+ console.log(msg, "right", msg == "right", msg.includes("right"));
+ if(msg.includes("right")){
+  console.log("next Slide");
+  slideRight();
+ }
+ if(msg.includes("left")){
+  console.log("Last slide");
+  slideLeft();
+ }
 });
+function slideRight(){
+ if(slideNum < 10){
+  slideNum = slideNum + 1;
+  slide = "http://raspberrypi.local:8081/pres1/Slide" + slideNum + ".JPG";
+  slideshow.src = slide;
+  console.log("next Slide");
+ }
+}
+
+function slideLeft(){
+ if(slideNum > 1){
+   slideNum = slideNum - 1;
+   slide = "http://raspberrypi.local:8081/pres1/Slide" + slideNum + ".JPG";
+   slideshow.src = slide;
+ }
+}
 </script>
 
 </body>

@@ -4,6 +4,7 @@ import sys
 import subprocess
 import threading
 import ArrowAdjust
+from collections import deque
 
 MASTER_KEY = {
             48912: 1,
@@ -29,6 +30,14 @@ MASTER_KEY = {
             48910: "\n",
             2147483647: "err"
             }
+
+def debounce_input():
+    global recent_events
+    if time.time() - timer > 0.2: 
+        manage_timer()
+        if len(recent_events) > 0:
+            recent_events.pop()
+
 def clean_threads():
     global active_threads
     dead_threads = [t for t in active_threads if not t.is_alive()]
@@ -37,7 +46,7 @@ def clean_threads():
     active_threads = [t for t in active_threads if t.is_alive()]
 
 def firefox_proc():
-    subprocess.run(["firefox"])    
+    subprocess.run(["firefox"])
     return
 
 def volume_up_proc():
@@ -49,7 +58,6 @@ def volume_down_proc():
     subprocess.run(["python", "VolumeAdjust.py", "--level", "-5"])    
     return
 
-
 def get_ir_device():
     devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
     for device in devices:
@@ -59,20 +67,36 @@ def get_ir_device():
             return device
     print("no device found!")
 
+def manage_timer():
+    global timer
+    timer = time.time()
+
 dev = get_ir_device()
 
 print("""Group Eleven:
     Austin Comeaux, Christian Pross, Jeremy Perando, Jonathan Eanes""")
 print(list(range(48911, 48922)))
 
+recent_events = deque()
 active_threads = []
+
+# debouncing timer to keep multiple inputs out
+timer = time.time()
+num_events = 0
 while(True):
     event = dev.read_one()
+    #debounce_input()
     if (event):
         if event.value == 0:
             continue
-        #try:
+        if event.value in recent_events:
+            debounce_input()
+            continue
+        debounce_input()
+        num_events += 1
+        print(num_events)
 
+        recent_events.appendleft(event.value)
         clean_threads()
         #print("Raw value", event.value)
         #print("Recieved command", MASTER_KEY[event.value])
@@ -97,7 +121,6 @@ while(True):
         #if MASTER_KEY[event.value] == 'down':
             #ArrowAdjust.scroll(-10)
             #print("Down")
-        time.sleep(.1)
         #except:
 
         #print(event.value)
