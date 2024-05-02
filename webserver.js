@@ -39,9 +39,15 @@ console.log("Connected!")
       console.log(lightvalue); //turn LED on or off, for now we will just show it in console.log
     }
   });
-});
-
-pythonProcess.stdout.on('data', (data) => {
+  
+  pythonProcess.stdout.on('data', (data) => {
 	console.log(data.toString('utf8')); 
+  socket.emit("txt", data.toString('utf8'));
 // Do something with the data returned from python script
 });
+});
+
+//pythonProcess.stdout.on('data', (data) => {
+	//console.log(data.toString('utf8')); 
+// Do something with the data returned from python script
+//});

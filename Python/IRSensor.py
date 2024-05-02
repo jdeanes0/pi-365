@@ -26,7 +26,8 @@ MASTER_KEY = {
             48904: "left",
             48905: "enter",
             48908: 0,
-            48910: "\n"
+            48910: "\n",
+            2147483647: "err"
             }
 def clean_threads():
     global active_threads
@@ -41,7 +42,7 @@ def firefox_proc():
 
 def volume_up_proc():
     subprocess.run(["python", "VolumeAdjust.py", "--level", "5"])    
-    print("increasing volume")
+    #print("increasing volume")
     return
 
 def volume_down_proc():
@@ -53,7 +54,7 @@ def get_ir_device():
     devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
     for device in devices:
         if (device.name == "gpio_ir_recv"):
-            print ("Using device", device.path, "n")
+            print ("Ready for input!")
             sys.stdout.flush()
             return device
     print("no device found!")
@@ -73,10 +74,11 @@ while(True):
         #try:
 
         clean_threads()
-        print("Raw value", event.value)
-        print("Recieved command", MASTER_KEY[event.value])
-        print(MASTER_KEY[event.value])
-        sys.stdout.flush()
+        #print("Raw value", event.value)
+        #print("Recieved command", MASTER_KEY[event.value])
+        if MASTER_KEY[event.value] != "err":
+            print(MASTER_KEY[event.value])
+            sys.stdout.flush()
         if MASTER_KEY[event.value] == 0:
             t1 = threading.Thread(target=firefox_proc)
             t1.start()
@@ -89,13 +91,15 @@ while(True):
             t1 = threading.Thread(target=volume_down_proc)
             t1.start()
             active_threads.append(t1)
-        if MASTER_KEY[event.value] == 'up':
-            ArrowAdjust.scroll(10)
-        if MASTER_KEY[event.value] == 'down':
-            ArrowAdjust.scroll(-10)
+        #if MASTER_KEY[event.value] == 'up':
+            #ArrowAdjust.scroll(10)   This is broken
+            #print("Up")
+        #if MASTER_KEY[event.value] == 'down':
+            #ArrowAdjust.scroll(-10)
+            #print("Down")
         time.sleep(.1)
         #except:
 
-        print(event.value)
+        #print(event.value)
         sys.stdout.flush()
 
