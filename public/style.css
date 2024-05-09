@@ -1,4 +1,43 @@
-body{
-background-color: 'blue';
-color:'red';
-}
+   input{
+     display:none;
+   }
+   body{
+     margin:0px;
+     background-color:rgba(235,255,255,1);
+     font-family:verdana;
+   }
+   a{
+    display:inline-block;
+    padding: 4px;
+    background-color:rgb(123, 216, 216);
+    font-size: medium;
+    color: black;
+    text-decoration: none;
+    line-height: 30px;
+    border-radius: 5px;
+    margin-bottom: 7px;
+   }
+
+   a:hover{
+    background-color:rgba(0, 255, 255, 0.747);
+   }
+
+   .header{
+     background-color:rgba(200,235,235,1);
+     width:100vw;
+   }
+   textarea{
+     border-radius:7px;
+     background-color:rgba(230,255,255,1);
+   }
+   .content{
+     margin:5px;
+   }
+   #slideshow{
+     border-radius: 5px;
+     border: 2px, solid, black;
+     display: block;
+     margin-left: auto;
+     margin-right: auto;
+     width: 95%;
+   }

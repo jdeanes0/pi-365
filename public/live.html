@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <title>IR Remote Control</title>
+<link rel="stylesheet" href="http://raspberrypi.local:8081/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="header" width="100%" height="40px">
+        <h1 style="display:inline; padding-right:10px;">IR Remote</h1>
+        <a href="http://raspberrypi.local:8081/index.html">Index</a>
+        <a href="http://raspberrypi.local:8081/live.html">Live Data</a>
+        <a href="http://raspberrypi.local:8081/docs.html">Documents</a>
+      </div>
+    
+<div class="content">
+  <textarea id="text" width="200" height="100"> </textarea>
+  <img id="slideshow" src="http://raspberrypi.local:8081/pres1/Slide1.JPG"></img>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script> <!-- include socket.io client side script -->
+<script>
+let slideshow = document.getElementById("slideshow");
+let slideNum = 1;
+let slide = "http://raspberrypi.local:8081/pres2/Slide" + slideNum + ".JPG"; 
+var socket = io(); //load socket.io-client and connect to the host that serves the page
+window.addEventListener("load", function(){ //when page loads
+  var lightbox = document.getElementById("light");
+  lightbox.addEventListener("change", function() { //add event listener for when checkbox changes
+    socket.emit("light", Number(this.checked)); //send button status to server (as 1 or 0)
+  });
+});
+socket.on('light', function (data) { //get button status from client
+  document.getElementById("light").checked = data; //change checkbox according to push button on Raspberry Pi
+  socket.emit("light", data); //send push button status to back to server
+});
+socket.on('txt', function (event) {
+ document.getElementById("text").textContent = event
+ console.log(event);
+ let msg = new String(event)
+ console.log(msg, "right", msg == "right", msg.includes("right"));
+ if(msg.includes("right")){
+  console.log("next Slide");
+  slideRight();
+ }
+ if(msg.includes("left")){
+  console.log("Last slide");
+  slideLeft();
+ }
+});
+function slideRight(){
+ if(slideNum < 10){
+  slideNum = slideNum + 1;
+  slide = "http://raspberrypi.local:8081/pres1/Slide" + slideNum + ".JPG";
+  slideshow.src = slide;
+  console.log("next Slide");
+ }
+}
+
+function slideLeft(){
+ if(slideNum > 1){
+   slideNum = slideNum - 1;
+   slide = "http://raspberrypi.local:8081/pres1/Slide" + slideNum + ".JPG";
+   slideshow.src = slide;
+ }
+}
+</script>
+
+</body>
+</html>
